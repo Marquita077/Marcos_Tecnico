@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: meu-site
+    env: python
+    buildCommand: ""
+    startCommand: gunicorn app:app
+    plan: free
+    envVars:
+      - key: SECRET_KEY
+        value: sua_chave_super_secreta
