@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Central de Arquivos</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        background: #f0f4f8;
+        padding: 20px;
+        color: #333;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: auto;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+      }
+
+      .tabs {
+        display: flex;
+        border-bottom: 2px solid #4a90e2;
+      }
+
+      .tabs label {
+        flex: 1;
+        text-align: center;
+        padding: 15px;
+        background: #eaf1fb;
+        cursor: pointer;
+        font-weight: 600;
+        color: #4a90e2;
+        border-right: 1px solid #cddbef;
+      }
+
+      .tabs label:last-child {
+        border-right: none;
+      }
+
+      input[type="radio"] {
+        display: none;
+      }
+
+      .tab-content {
+        display: none;
+        padding: 20px;
+      }
+
+      #tab1:checked ~ .contents #content1,
+      #tab2:checked ~ .contents #content2,
+      #tab3:checked ~ .contents #content3 {
+        display: block;
+      }
+
+      #tab1:checked + label,
+      #tab2:checked + label,
+      #tab3:checked + label {
+        background: #4a90e2;
+        color: white;
+      }
+
+      h2 {
+        color: #4a90e2;
+        margin-bottom: 15px;
+      }
+
+      textarea,
+      input[type="password"],
+      input[type="file"] {
+        width: 100%;
+        padding: 10px;
+        font-size: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        margin-bottom: 10px;
+      }
+
+      button {
+        background: #4a90e2;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1rem;
+      }
+
+      button:hover {
+        background: #357bd8;
+      }
+
+      .nota,
+      .arquivo {
+        background: #f8faff;
+        border-left: 4px solid #4a90e2;
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 6px;
+      }
+
+      footer {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 0.9rem;
+        color: #777;
+      }
+
+      .logout {
+        text-align: right;
+        padding: 10px 20px;
+      }
+
+      .logout a {
+        color: #4a90e2;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      @media (max-width: 600px) {
+        .tabs label {
+          font-size: 0.9rem;
+          padding: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="logout">
+        <a href="/logout">🚪 Sair</a>
+      </div>
+
+      <!-- Abas -->
+      <input type="radio" name="tab" id="tab1" checked />
+      <label for="tab1">📝 Notas</label>
+
+      <input type="radio" name="tab" id="tab2" />
+      <label for="tab2">🗂️ Arquivos</label>
+
+      <input type="radio" name="tab" id="tab3" />
+      <label for="tab3">📤 Upload</label>
+
+      <div class="contents">
+        <!-- Aba 1: Notas -->
+        <div class="tab-content" id="content1">
+          <h2>Minhas Notas</h2>
+          <form action="/nota" method="POST">
+            <textarea
+              name="mensagem"
+              placeholder="Escreva sua nota..."
+              required
+            ></textarea>
+            <button type="submit">Salvar Nota</button>
+          </form>
+          <br />
+          {% if notas %} {% for nota in notas|reverse %}
+          <div class="nota">
+            <p>{{ nota.texto }}</p>
+            <form
+              action="/nota/excluir/{{ notas|length - 1 - loop.index0 }}"
+              method="POST"
+            >
+              <input
+                type="password"
+                name="senha"
+                placeholder="Senha para excluir"
+                required
+              />
+              <button type="submit" style="background: #e74c3c">
+                🗑️ Excluir
+              </button>
+            </form>
+          </div>
+          {% endfor %} {% else %}
+          <p>Nenhuma nota ainda.</p>
+          {% endif %}
+        </div>
+
+        <!-- Aba 2: Arquivos -->
+        <div class="tab-content" id="content2">
+          <h2>Arquivos Enviados</h2>
+          {% if arquivos %} {% for arq in arquivos %}
+          <div class="arquivo">
+            <p>{{ arq }}</p>
+            <a
+              href="{{ url_for('baixar_arquivo', nome_arquivo=arq) }}"
+              target="_blank"
+              style="color: #4a90e2"
+              >🔽 Baixar</a
+            >
+          </div>
+          {% endfor %} {% else %}
+          <p>Nenhum arquivo disponível.</p>
+          {% endif %}
+        </div>
+
+        <!-- Aba 3: Upload -->
+        <div class="tab-content" id="content3">
+          <h2>Enviar Arquivo</h2>
+          <form action="/upload" method="POST" enctype="multipart/form-data">
+            <input type="file" name="arquivo" required />
+            <button type="submit">Enviar</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <footer>Desenvolvido por Marcos Vinicius • Flask App • © 2025</footer>
+  </body>
+</html>
